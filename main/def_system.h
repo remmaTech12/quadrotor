@@ -13,4 +13,6 @@
 
 #define PID_MAX 2000
 
-//#define DEBUG_BUILD
+#define EMERGENCY_SWITCH 4
+
+#define DEBUG_BUILD

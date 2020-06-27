@@ -17,7 +17,7 @@ class PID {
     int sampling_time_ms = 0;
 
     // roll, pitch, yaw
-    float Kp[3] = {50.0f, 50.0f, 30.0f};
+    float Kp[3] = {100.0f, 100.0f, 100.0f};
     float Ki[3] = { 0.0f,  0.0f,  0.0f};
     float Kd[3] = { 1.0f,  1.0f,  1.0f};
 

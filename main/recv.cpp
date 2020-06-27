@@ -4,7 +4,8 @@ BluetoothSerial SerialBT;
 
 Receiver::Receiver() {}
 
-void Receiver::setup() {
+void Receiver::setup(Arm &arm) {
+    m_arm = arm;
     /*
     pinMode(LED_PIN1, OUTPUT);
     pinMode(LED_PIN2, OUTPUT);
@@ -97,13 +98,22 @@ void Receiver::update_data() {
             return;
         }
 #ifdef DEBUG_BUILD
+        /*
+        Serial.println("Receive Data");
         Serial.println(recv_data[0]);
         Serial.println(recv_data[1]);
         Serial.println(recv_data[2]);
         Serial.println(recv_data[3]);
+        */
 #endif
 
         //led_control(recv_data);
+    }
+}
+
+void Receiver::set_arm_status(Arm &arm) {
+    if (recv_data[1] <= 5 && recv_data[2] >= 250) {
+        arm.set_arm_status(true);
     }
 }
 
