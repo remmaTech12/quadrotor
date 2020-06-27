@@ -1,0 +1,6 @@
+{
+    "board": "esp32:esp32:esp32",
+    "configuration": "PSRAM=disabled,PartitionScheme=default,CPUFreq=240,FlashMode=qout,FlashFreq=80,FlashSize=4M,UploadSpeed=115200,DebugLevel=none",
+    "port": "/dev/ttyUSB1",
+    "sketch": "transmitter.ino"
+}
