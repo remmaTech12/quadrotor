@@ -15,6 +15,3 @@ void InputCmd::sense_value() {
     right_x_val  = analogRead (RIGHT_X_PIN) >> 4;
     right_y_val  = analogRead (RIGHT_Y_PIN) >> 4;
 }
-
-void InputCmd::serial_print_raw_data() {
-}

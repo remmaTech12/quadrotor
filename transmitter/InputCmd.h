@@ -9,7 +9,6 @@ class InputCmd {
 
     void setup();
     void sense_value();
-    void serial_print_raw_data();
 
     int get_left_sw_val()  { return left_sw_val; }
     int get_left_x_val()   { return left_x_val; }

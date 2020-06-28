@@ -52,7 +52,9 @@ uint8_t Transmit::calculate_checksum(uint8_t *data) {
 }
 
 uint8_t Transmit::pack_switch_data() {
-    return (0x01 & input.get_left_sw_val()) | (0x02 & (input.get_right_sw_val() << 1));
+    uint8_t left_sw_data  = 0x01 & input.get_left_sw_val();
+    uint8_t right_sw_data = 0x02 & (input.get_right_sw_val() << 1);
+    return left_sw_data | right_sw_data;
 }
 
 void Transmit::transmit_data() {
