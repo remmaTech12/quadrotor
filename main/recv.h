@@ -14,26 +14,21 @@ class Receiver {
    public:
     Receiver();
 
-    void setup(Arm &arm);
+    void setup();
     void update_data();
     void get_command(int data[4]);
     void set_arm_status(Arm &arm);
     void emergency_stop(Arm &arm, Motor &motor);
 
    private:
-    Arm m_arm;
     uint8_t recv_data[RECEIVE_DATA_SIZE];
-    unsigned int left_x_val = 0;
-    unsigned int left_y_val = 0;
     uint8_t pre_left_sw_data  = 0x00;
     uint8_t pre_right_sw_data = 0x00;
 
     void notify_bluetooth_setup_finished();
-    uint8_t calculate_checksum(uint8_t *data);
-    void led_control(uint8_t *data);
-
-    bool is_left_switch_pressed(uint8_t *data);
-    bool is_right_switch_pressed(uint8_t *data);
+    uint8_t calculate_checksum();
+    bool is_left_switch_pressed();
+    bool is_right_switch_pressed();
 };
 
 #endif  // #ifndef Receiver_h

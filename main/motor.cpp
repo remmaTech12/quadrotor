@@ -2,12 +2,11 @@
 
 Motor::Motor() {}
 
-void Motor::setup(Arm &arm) {
-    m_arm = arm;
+void Motor::setup() {
     //pinMode(MOTOR_M1, OUTPUT);
     //pinMode(MOTOR_E1, OUTPUT);
-    ledcSetup(5, 12800, 8);
-    ledcAttachPin(MOTOR_E1, 5);
+    //ledcSetup(5, 12800, 8);
+    //ledcAttachPin(MOTOR_E1, 5);
 
     pinMode(LED_PIN1, OUTPUT);
     pinMode(LED_PIN2, OUTPUT);
@@ -28,91 +27,81 @@ void Motor::control() {
     ledcWrite(5, 255);
 }
 
-void Motor::format_pid_data() {
-    //int thrust = PID_MAX/2;
-    int thrust = 0;
-    m_test_pid[0] = - m_pid_rpy[0] + m_pid_rpy[1] + m_pid_rpy[2] + thrust;
-    m_test_pid[1] = - m_pid_rpy[0] - m_pid_rpy[1] - m_pid_rpy[2] + thrust;
-    m_test_pid[2] = + m_pid_rpy[0] - m_pid_rpy[1] + m_pid_rpy[2] + thrust;
-    m_test_pid[3] = + m_pid_rpy[0] + m_pid_rpy[1] - m_pid_rpy[2] + thrust;
-
-    Serial.println("PID_value");
-    for (int i=0; i<4; i++) {
-        if (m_test_pid[i] > PID_MAX) {
-            m_test_pid[i] = PID_MAX;
-        }
-        if (m_test_pid[i] < 0) {
-            m_test_pid[i] = 0;
-        }
-
-        m_test_pid[i] = 255*m_test_pid[i]/PID_MAX;
-        #ifdef DEBUG_BUILD
-            /*
-            Serial.print(i);
-            Serial.print(": ");
-            Serial.print(m_test_pid[i]);
-            if (i==4) Serial.print("\n");
-            else Serial.println(", ");
-            */
-        #endif
-    };
-}
-
-void Motor::format_cmd_data() {
-    int cmd_thrust = m_cmd_data[0] * 2;
-    int cmd_roll   = m_cmd_data[3] - 127;
-    int cmd_pitch  = m_cmd_data[2] - 127;
-    int cmd_yaw    = m_cmd_data[1] - 127;
-
-    m_cmd_data[0] = + cmd_roll - cmd_pitch - cmd_yaw + cmd_thrust;
-    m_cmd_data[1] = + cmd_roll + cmd_pitch + cmd_yaw + cmd_thrust;
-    m_cmd_data[2] = - cmd_roll + cmd_pitch - cmd_yaw + cmd_thrust;
-    m_cmd_data[3] = - cmd_roll - cmd_pitch + cmd_yaw + cmd_thrust;
-
-    Serial.println("Command_value");
-    for (int i=0; i<4; i++) {
-        if (m_cmd_data[i] > 255) {
-            m_cmd_data[i] = 255;
-        }
-        if (m_cmd_data[i] < 0) {
-            m_cmd_data[i] = 0;
-        }
-        #ifdef DEBUG_BUILD
-            /*
-            Serial.print(i);
-            Serial.print(": ");
-            Serial.print(m_cmd_data[i]);
-            if (i==4) Serial.print("\n");
-            else Serial.println(", ");
-            */
-        #endif
-    };
+void Motor::limit_command(int &cmd, int min, int max) {
+    if (cmd > max) { cmd = max; }
+    if (cmd < min) { cmd = min; }
 }
 
 void Motor::stop_motor() {
-    ledcWrite(0, 0);
-    ledcWrite(1, 0);
-    ledcWrite(2, 0);
-    ledcWrite(3, 0);
+    for (int i=0; i<4; i++) {
+        ledcWrite(i, 0);
+    }
 }
 
-void Motor::test_led(int cmd_data[4], float pid_rpy[3], Arm &arm) {
+void Motor::debug_print(int data[4]) {
+    Serial.print("thrust: ");
+    Serial.print(data[0]);
+    Serial.print(", roll: ");
+    Serial.print(data[3]);
+    Serial.print(", pitch: ");
+    Serial.print(data[2]);
+    Serial.print(", yaw: ");
+    Serial.println(data[1]);
+}
+
+void Motor::format_cmd_data(int cmd_data[4]) {
+    int cmd_thrust = cmd_data[0];
+    int cmd_roll   = cmd_data[3] - 127;
+    int cmd_pitch  = cmd_data[2] - 127;
+    int cmd_yaw    = cmd_data[1] - 127;
+
+    m_recv_cmd[0] = + cmd_roll - cmd_pitch - cmd_yaw + cmd_thrust;
+    m_recv_cmd[1] = + cmd_roll + cmd_pitch + cmd_yaw + cmd_thrust;
+    m_recv_cmd[2] = - cmd_roll + cmd_pitch - cmd_yaw + cmd_thrust;
+    m_recv_cmd[3] = - cmd_roll - cmd_pitch + cmd_yaw + cmd_thrust;
+
+    for (int i = 0; i < 4; i++) {
+        limit_command(m_recv_cmd[i], 0, 255);
+    };
+#ifdef DEBUG_RECV_COMMAND
+    Serial.print("RECEIVE COMMAND: ");
+    debug_print(m_recv_cmd);
+#endif
+}
+
+void Motor::format_pid_data(float pid_data[3]) {
+    int thrust = 0;
+    m_pid_cmd[0] = - pid_data[0] + pid_data[1] + pid_data[2] + thrust;
+    m_pid_cmd[1] = - pid_data[0] - pid_data[1] - pid_data[2] + thrust;
+    m_pid_cmd[2] = + pid_data[0] - pid_data[1] + pid_data[2] + thrust;
+    m_pid_cmd[3] = + pid_data[0] + pid_data[1] - pid_data[2] + thrust;
+
+    for (int i=0; i<4; i++) {
+        limit_command(m_pid_cmd[i], 0, PID_MAX);
+        m_pid_cmd[i] = 255*m_pid_cmd[i]/PID_MAX;
+    };
+#ifdef DEBUG_PID_COMMAND
+    Serial.print("PID COMMAND: ");
+    debug_print(m_pid_cmd);
+#endif
+}
+
+void Motor::test_led(int cmd_data[4], float pid_data[3], Arm &arm) {
     if (arm.get_arm_status() == false) { return; }
 
-    for (int i = 0; i < 4; i++) { m_cmd_data[i] = cmd_data[i]; }
-    for (int i = 0; i < 3; i++) { m_pid_rpy[i] = pid_rpy[i]; }
+    format_cmd_data(cmd_data);
+    format_pid_data(pid_data);
 
-    format_cmd_data();
-    format_pid_data();
+    float pid_ratio = 0.5;
+    int motor_data[4] = {0, 0, 0, 0};
 
-    ledcWrite(0, m_test_pid[0]*0.5 + m_cmd_data[0]*0.5);
-    ledcWrite(1, m_test_pid[1]*0.5 + m_cmd_data[1]*0.5);
-    ledcWrite(2, m_test_pid[2]*0.5 + m_cmd_data[2]*0.5);
-    ledcWrite(3, m_test_pid[3]*0.5 + m_cmd_data[3]*0.5);
-    /*
-    Serial.println(m_test_pid[0]*0.5 + m_cmd_data[0]*0.5);
-    Serial.println(m_test_pid[1]*0.5 + m_cmd_data[1]*0.5);
-    Serial.println(m_test_pid[2]*0.5 + m_cmd_data[2]*0.5);
-    Serial.println(m_test_pid[3]*0.5 + m_cmd_data[3]*0.5);
-    */
+    for (int i=0; i<4; i++) {
+        motor_data[i] = m_pid_cmd[i]*pid_ratio + m_recv_cmd[i]*(1.0f-pid_ratio);
+        ledcWrite(i, motor_data[i]);
+    }
+
+#ifdef DEBUG_MOTOR_COMMAND
+    Serial.print("MOTOR COMMAND: ");
+    debug_print(motor_data);
+#endif
 }

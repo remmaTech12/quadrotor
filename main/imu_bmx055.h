@@ -28,12 +28,13 @@ class imu_bmx055 {
     imu_bmx055();
 
     void setup();
+    void get_attitude_data(float data[3]);
+
     void print_all_data();
     void print_accel_data();
     void print_gyro_data();
     void print_mag_data();
     void print_attitude_data();
-    void get_attitude_data(float data[3]);
 
    private:
     float xAccl = 0.00;
@@ -50,9 +51,7 @@ class imu_bmx055 {
     float yaw   = 0.00;
 
     Madgwick madgwick;
-    int sampling_time_ms;
     float sample_frequency;
-    bool is_first = true; 
 
     void calculate_accel();
     void calculate_gyro();

@@ -16,9 +16,8 @@ void setup() {
     Serial.begin(115200);
 
     imu.setup();
-    pid.setup();
-    receiver.setup(arm);
-    motor.setup(arm);
+    receiver.setup();
+    motor.setup();
     emergency.setup();
 
     delay(300);
@@ -38,12 +37,10 @@ void loop() {
 
     imu.get_attitude_data(rpy_data);
 
-    pid.set_rpy(rpy_data);
-    pid.calculate_pid();
+    pid.calculate_pid(rpy_data);
     pid.get_pid(pid_data);
-    Serial.println(arm.get_arm_status());
 
     motor.test_led(cmd_data, pid_data, arm);
 
-    //delay(SAMPLING_TIME_MS);
+    delay(SAMPLING_TIME_MS);
 }

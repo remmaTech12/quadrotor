@@ -15,9 +15,8 @@ imu_bmx055::imu_bmx055() {
 }
 
 void imu_bmx055::setup() {
-    sampling_time_ms = SAMPLING_TIME_MS;
     Wire.begin();
-    sample_frequency = (float) 1/((float) sampling_time_ms/1000);
+    sample_frequency = (float) 1/((float) SAMPLING_TIME_MS/1000);
     madgwick.begin(sample_frequency);
 
     //------------------------------------------------------------//
