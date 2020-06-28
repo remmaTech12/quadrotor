@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "BluetoothSerial.h"
 #include "arm.h"
+#include "motor.h"
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
@@ -17,12 +18,15 @@ class Receiver {
     void update_data();
     void get_command(int data[4]);
     void set_arm_status(Arm &arm);
+    void emergency_stop(Arm &arm, Motor &motor);
 
    private:
     Arm m_arm;
     uint8_t recv_data[RECEIVE_DATA_SIZE];
     unsigned int left_x_val = 0;
     unsigned int left_y_val = 0;
+    uint8_t pre_left_sw_data  = 0x00;
+    uint8_t pre_right_sw_data = 0x00;
 
     void notify_bluetooth_setup_finished();
     uint8_t calculate_checksum(uint8_t *data);

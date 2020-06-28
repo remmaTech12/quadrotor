@@ -34,6 +34,7 @@ void loop() {
     receiver.update_data();
     receiver.get_command(cmd_data);
     receiver.set_arm_status(arm);
+    receiver.emergency_stop(arm, motor);
 
     imu.get_attitude_data(rpy_data);
 

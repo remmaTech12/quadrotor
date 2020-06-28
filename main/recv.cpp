@@ -50,9 +50,12 @@ uint8_t Receiver::calculate_checksum(uint8_t *data) {
 }
 
 bool Receiver::is_left_switch_pressed(uint8_t *data) {
-    if ((0x01 & data[5]) == 0x00) {
+    uint8_t left_sw_data = 0x01 & data[5];
+    if (left_sw_data == 0x00 && left_sw_data != pre_left_sw_data) {
+        pre_left_sw_data = left_sw_data;
         return true;
     }
+    pre_left_sw_data = left_sw_data;
     return false;
 }
 
@@ -122,4 +125,11 @@ void Receiver::get_command(int data[4]) {
     data[1] = recv_data[2]; // yaw
     data[2] = recv_data[3]; // pitch
     data[3] = recv_data[4]; // roll
+}
+
+void Receiver::emergency_stop(Arm &arm, Motor &motor) {
+    if (is_left_switch_pressed(recv_data)) {
+        arm.set_arm_status(false);
+        motor.stop_motor();
+    }
 }
