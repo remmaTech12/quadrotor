@@ -19,15 +19,16 @@ class Receiver {
     void get_command(int data[4]);
     void set_arm_status(Arm &arm);
     void emergency_stop(Arm &arm, Motor &motor);
+    bool is_left_switch_pressed();
 
    private:
+    int disconnect_count = 0;
     uint8_t recv_data[RECEIVE_DATA_SIZE];
     uint8_t pre_left_sw_data  = 0x00;
     uint8_t pre_right_sw_data = 0x00;
 
     void notify_bluetooth_setup_finished();
     uint8_t calculate_checksum();
-    bool is_left_switch_pressed();
     bool is_right_switch_pressed();
 };
 

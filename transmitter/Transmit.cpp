@@ -83,11 +83,20 @@ void Transmit::transmit_data() {
     Serial.print("\n\n");
 #endif
 
+#ifdef ADDITIONAL_BUTTONS
+    Serial.print("Left Switch2: ");
+    Serial.print(input.get_left_sw2_val());
+    Serial.print(", ");
+    Serial.print("Right Switch2: ");
+    Serial.print(input.get_right_sw2_val());
+    Serial.print(", ");
+#endif
+
     send_data[0] = 'T';
-    send_data[1] = input.get_left_x_val();
-    send_data[2] = input.get_left_y_val();
-    send_data[3] = input.get_right_x_val();
-    send_data[4] = input.get_right_y_val();
+    send_data[1] = input.get_left_y_val();
+    send_data[2] = input.get_left_x_val();
+    send_data[3] = input.get_right_y_val();
+    send_data[4] = input.get_right_x_val();
     send_data[5] = pack_switch_data();
     send_data[6] = calculate_checksum(send_data);
     SerialBT.write(send_data, sizeof(send_data)/sizeof(send_data[0]));

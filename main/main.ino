@@ -40,7 +40,9 @@ void loop() {
     pid.calculate_pid(rpy_data);
     pid.get_pid(pid_data);
 
-    motor.test_led(cmd_data, pid_data, arm);
+    motor.control(cmd_data, pid_data, arm);
+    //motor.test_control(128);
+    //motor.test_count();
 
     delay(SAMPLING_TIME_MS);
 }

@@ -15,8 +15,8 @@ class Transmit {
 
     private:
         int m_sampling_time_ms = SAMPLING_TIME_MS;
-        String MACadd = "24:62:AB:DC:30:5E";
-        uint8_t address[6] = {0x24, 0x62, 0xAB, 0xDC, 0x30, 0x5E};
+        //String MACadd = "7C:9E:BD:E3:C1:12";
+        uint8_t address[6] = {0x7C, 0x9E, 0xBD, 0xE3, 0xC1, 0x12};
         bool connected;
 
         void bluetooth_setup();

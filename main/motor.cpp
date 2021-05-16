@@ -3,28 +3,58 @@
 Motor::Motor() {}
 
 void Motor::setup() {
-    //pinMode(MOTOR_M1, OUTPUT);
-    //pinMode(MOTOR_E1, OUTPUT);
-    //ledcSetup(5, 12800, 8);
-    //ledcAttachPin(MOTOR_E1, 5);
+    pinMode(MOTOR_DIR1, OUTPUT);
+    pinMode(MOTOR_DIR2, OUTPUT);
+    pinMode(MOTOR_DIR3, OUTPUT);
+    pinMode(MOTOR_DIR4, OUTPUT);
+    digitalWrite(MOTOR_DIR1, HIGH);
+    digitalWrite(MOTOR_DIR2, HIGH);
+    digitalWrite(MOTOR_DIR3, LOW);
+    digitalWrite(MOTOR_DIR4, LOW);
 
-    pinMode(LED_PIN1, OUTPUT);
-    pinMode(LED_PIN2, OUTPUT);
-    pinMode(LED_PIN3, OUTPUT);
-    pinMode(LED_PIN4, OUTPUT);
+    pinMode(MOTOR_PWM1, OUTPUT);
+    pinMode(MOTOR_PWM2, OUTPUT);
+    pinMode(MOTOR_PWM3, OUTPUT);
+    pinMode(MOTOR_PWM4, OUTPUT);
     ledcSetup(0, 12800, 8);
-    ledcAttachPin(LED_PIN1, 0);
+    ledcAttachPin(MOTOR_PWM1, 0);
     ledcSetup(1, 12800, 8);
-    ledcAttachPin(LED_PIN2, 1);
+    ledcAttachPin(MOTOR_PWM2, 1);
     ledcSetup(2, 12800, 8);
-    ledcAttachPin(LED_PIN3, 2);
+    ledcAttachPin(MOTOR_PWM3, 2);
     ledcSetup(3, 12800, 8);
-    ledcAttachPin(LED_PIN4, 3);
+    ledcAttachPin(MOTOR_PWM4, 3);
+    for (int i = 0; i < 4; i++) {
+        ledcWrite(i, 0);
+    }
 }
 
-void Motor::control() {
-    digitalWrite(MOTOR_M1, LOW);
-    ledcWrite(5, 255);
+void Motor::test_control(int motor_val) {
+    int test_motor_val = motor_val;
+    if (digitalRead(EMERGENCY_SWITCH) == LOW) {
+        ledcWrite(0, test_motor_val);
+        ledcWrite(1, test_motor_val);
+        ledcWrite(2, test_motor_val);
+        ledcWrite(3, test_motor_val);
+    } else {
+        ledcWrite(0, 0);
+        ledcWrite(1, 0);
+        ledcWrite(2, 0);
+        ledcWrite(3, 0);
+    }
+}
+
+void Motor::test_count() {
+    if (pre_button == HIGH && digitalRead(EMERGENCY_SWITCH) == LOW) {
+        tcount += 5;
+    }
+    int test_motor_val = (tcount % 26) * 10;
+    ledcWrite(0, test_motor_val);
+    ledcWrite(1, test_motor_val);
+    ledcWrite(2, test_motor_val);
+    ledcWrite(3, test_motor_val);
+
+    pre_button = digitalRead(EMERGENCY_SWITCH);
 }
 
 void Motor::limit_command(int &cmd, int min, int max) {
@@ -50,10 +80,11 @@ void Motor::debug_print(int data[4]) {
 }
 
 void Motor::format_cmd_data(int cmd_data[4]) {
+    int control_damper = 20;
     int cmd_thrust = cmd_data[0];
-    int cmd_roll   = cmd_data[3] - 127;
-    int cmd_pitch  = cmd_data[2] - 127;
-    int cmd_yaw    = cmd_data[1] - 127;
+    int cmd_roll   = (cmd_data[3] - 127)/control_damper;
+    int cmd_pitch  = (cmd_data[2] - 127)/control_damper;
+    int cmd_yaw    = (cmd_data[1] - 127)/control_damper;
 
     m_recv_cmd[0] = + cmd_roll - cmd_pitch - cmd_yaw + cmd_thrust;
     m_recv_cmd[1] = + cmd_roll + cmd_pitch + cmd_yaw + cmd_thrust;
@@ -61,7 +92,7 @@ void Motor::format_cmd_data(int cmd_data[4]) {
     m_recv_cmd[3] = - cmd_roll - cmd_pitch + cmd_yaw + cmd_thrust;
 
     for (int i = 0; i < 4; i++) {
-        limit_command(m_recv_cmd[i], 0, 255);
+        limit_command(m_recv_cmd[i], 0, LIMIT_MOTOR);
     };
 #ifdef DEBUG_RECV_COMMAND
     Serial.print("RECEIVE COMMAND: ");
@@ -78,7 +109,7 @@ void Motor::format_pid_data(float pid_data[3]) {
 
     for (int i=0; i<4; i++) {
         limit_command(m_pid_cmd[i], 0, PID_MAX);
-        m_pid_cmd[i] = 255*m_pid_cmd[i]/PID_MAX;
+        m_pid_cmd[i] = LIMIT_MOTOR*m_pid_cmd[i]/PID_MAX;
     };
 #ifdef DEBUG_PID_COMMAND
     Serial.print("PID COMMAND: ");
@@ -86,8 +117,13 @@ void Motor::format_pid_data(float pid_data[3]) {
 #endif
 }
 
-void Motor::test_led(int cmd_data[4], float pid_data[3], Arm &arm) {
-    if (arm.get_arm_status() == false) { return; }
+void Motor::control(int cmd_data[4], float pid_data[3], Arm &arm) {
+    if (arm.get_arm_status() == false) { 
+        for (int i=0; i<4; i++) {
+            ledcWrite(i, 0);
+        }
+        return;
+    }
 
     format_cmd_data(cmd_data);
     format_pid_data(pid_data);

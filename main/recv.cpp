@@ -64,6 +64,7 @@ bool Receiver::is_right_switch_pressed() {
 
 void Receiver::update_data() {
     if (SerialBT.available()) {
+        disconnect_count = 0; 
         SerialBT.readBytes(recv_data, RECEIVE_DATA_SIZE);
 
         if (recv_data[0] != 'T') {
@@ -86,6 +87,8 @@ void Receiver::update_data() {
         Serial.print(recv_data[4]);
         Serial.print("\n");
 #endif
+    } else {
+        disconnect_count++;
     }
 }
 
@@ -99,13 +102,17 @@ void Receiver::get_command(int data[4]) {
 void Receiver::set_arm_status(Arm &arm) {
     int left_x_val = recv_data[1];
     int left_y_val = recv_data[2];
-    if (left_x_val <= 5 && left_y_val >= 250) {
+    if (left_x_val <= 50 && left_y_val >= 230 ) {
         arm.set_arm_status(true);
     }
 }
 
 void Receiver::emergency_stop(Arm &arm, Motor &motor) {
     if (is_left_switch_pressed()) {
+        arm.set_arm_status(false);
+        motor.stop_motor();
+    }
+    if (disconnect_count > 10) {
         arm.set_arm_status(false);
         motor.stop_motor();
     }

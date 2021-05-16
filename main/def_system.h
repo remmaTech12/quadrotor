@@ -1,13 +1,15 @@
 // PIN allccation
-#define LED_PIN1 12
-#define LED_PIN2 13
-#define LED_PIN3 14
-#define LED_PIN4 15
+#define MOTOR_PWM1 12
+#define MOTOR_PWM2 13
+#define MOTOR_PWM3 14
+#define MOTOR_PWM4 15
+
+#define MOTOR_DIR1 18
+#define MOTOR_DIR2 19
+#define MOTOR_DIR3 32
+#define MOTOR_DIR4 33
 
 #define BUILTIN_LED 2
-
-#define MOTOR_M1 34 // 12, AIN1
-#define MOTOR_E1 35 // 13, AIN2
 
 #define EMERGENCY_SWITCH 4
 
@@ -16,6 +18,7 @@
 #define SAMPLING_TIME_MS 10
 #define RECEIVE_DATA_SIZE 7
 #define PID_MAX 2000
+#define LIMIT_MOTOR 255
 
 
 // Debug setting
