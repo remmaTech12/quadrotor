@@ -7,7 +7,9 @@
         "ostream": "cpp",
         "sstream": "cpp",
         "unordered_map": "cpp",
-        "*.cuh": "cpp"
+        "*.cuh": "cpp",
+        "streambuf": "cpp",
+        "condition_variable": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

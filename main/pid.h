@@ -13,9 +13,9 @@ class PID {
 
    private:
     // Gain: roll, pitch, yaw
-    float Kp[3] = {70.0f, 70.0f, 30.0f};
-    float Ki[3] = { 0.0f,  0.0f,  0.0f};
-    float Kd[3] = { 20.0f,  20.0f,  0.0f};
+    float Kp[3] = {20.0f, 20.0f, 20.0f};
+    float Ki[3] = { 0.25f,  0.2f,  0.2f};
+    float Kd[3] = { 15.0f,  15.0f, 15.0f};
 
     // Measured value: roll, pitch, yaw
     float rpy_p[3]   = {0.0f, 0.0f, 0.0f};

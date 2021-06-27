@@ -239,5 +239,5 @@ void imu_bmx055::calculate_attitude() {
     madgwick.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
     roll  = madgwick.getRoll();
     pitch = madgwick.getPitch();
-    yaw   = madgwick.getYaw();
+    yaw   = madgwick.getYaw() - 180.0f;
 }

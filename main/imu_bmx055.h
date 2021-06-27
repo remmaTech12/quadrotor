@@ -13,7 +13,7 @@
 #define imu_bmx055_h
 #include <Wire.h>
 #include "Arduino.h"
-#include "Madgwick_m.h"
+#include "MadgwickAHRS.h"
 #include "def_system.h"
 
 // BMX055　I2C address of accelerometer

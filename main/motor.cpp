@@ -80,7 +80,7 @@ void Motor::debug_print(int data[4]) {
 }
 
 void Motor::format_cmd_data(int cmd_data[4]) {
-    int control_damper = 20;
+    int control_damper = 3;
     int cmd_thrust = cmd_data[0];
     int cmd_roll   = (cmd_data[3] - 127)/control_damper;
     int cmd_pitch  = (cmd_data[2] - 127)/control_damper;
@@ -128,7 +128,7 @@ void Motor::control(int cmd_data[4], float pid_data[3], Arm &arm) {
     format_cmd_data(cmd_data);
     format_pid_data(pid_data);
 
-    float pid_ratio = 0.5;
+    float pid_ratio = 0.45;
     int motor_data[4] = {0, 0, 0, 0};
 
     for (int i=0; i<4; i++) {
