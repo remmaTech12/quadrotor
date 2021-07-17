@@ -1,4 +1,4 @@
-#include "pid.h"
+#include "../include/pid.h"
 
 PID::PID() {}
 
@@ -15,16 +15,16 @@ void PID::calculate_pid(float data[3]) {
         rpy_p[i] = data[i];
     }
 
-    calculate_rpy();
+    calculate_id_term();
     for (int i=0; i<3; i++) {
         pid_rpy[i] = Kp[i]*rpy_p[i] + Ki[i]*rpy_i[i] + Kd[i]*rpy_d[i];
     }
 }
 
-void PID::calculate_rpy() {
+void PID::calculate_id_term() {
     for (int i=0; i<3; i++) {
-        rpy_d[i]   = (rpy_p[i] - rpy_pre[i]) / ((float)SAMPLING_TIME_MS/1000);
         rpy_i[i]  += rpy_p[i];
+        rpy_d[i]   = (rpy_p[i] - rpy_pre[i]) / ((float)SAMPLING_TIME_MS/1000);
         rpy_pre[i] = rpy_p[i];
     }
 }

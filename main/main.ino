@@ -1,9 +1,9 @@
-#include "recv.h"
-#include "imu_bmx055.h"
-#include "pid.h"
-#include "motor.h"
-#include "def_system.h"
-#include "emergency.h"
+#include "./include/recv.h"
+#include "./include/imu_bmx055.h"
+#include "./include/pid.h"
+#include "./include/motor.h"
+#include "./include/def_system.h"
+#include "./include/emergency.h"
 
 imu_bmx055 imu;
 Receiver receiver;

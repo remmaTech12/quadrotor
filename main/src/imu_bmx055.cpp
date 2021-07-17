@@ -9,7 +9,7 @@
 //   http://akizukidenshi.com/catalog/g/gK-13010/                 //
 //================================================================//
 
-#include "imu_bmx055.h"
+#include "../include/imu_bmx055.h"
 
 imu_bmx055::imu_bmx055() {
 }

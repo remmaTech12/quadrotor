@@ -1,4 +1,4 @@
-#include "motor.h"
+#include "../include/motor.h"
 
 Motor::Motor() {}
 
@@ -119,9 +119,7 @@ void Motor::format_pid_data(float pid_data[3]) {
 
 void Motor::control(int cmd_data[4], float pid_data[3], Arm &arm) {
     if (arm.get_arm_status() == false) { 
-        for (int i=0; i<4; i++) {
-            ledcWrite(i, 0);
-        }
+        stop_motor();
         return;
     }
 

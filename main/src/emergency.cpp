@@ -1,4 +1,5 @@
-#include "emergency.h"
+#include "../include/def_system.h"
+#include "../include/emergency.h"
 
 Emergency::Emergency() {}
 

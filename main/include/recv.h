@@ -23,6 +23,8 @@ class Receiver {
 
    private:
     int disconnect_count = 0;
+    bool first_byte_check = true;
+    bool checksum_success = true;
     uint8_t recv_data[RECEIVE_DATA_SIZE];
     uint8_t pre_left_sw_data  = 0x00;
     uint8_t pre_right_sw_data = 0x00;

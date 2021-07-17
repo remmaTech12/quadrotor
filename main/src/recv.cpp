@@ -1,4 +1,4 @@
-#include "recv.h"
+#include "../include/recv.h"
 
 BluetoothSerial SerialBT;
 
@@ -69,11 +69,13 @@ void Receiver::update_data() {
 
         if (recv_data[0] != 'T') {
             Serial.print("Receive error!");
+            first_byte_check = false;
             return;
         }
 
         if (recv_data[6] != calculate_checksum()) {
             Serial.print("Decode error!");
+            checksum_success = false;
             return;
         }
 #ifdef DEBUG_RECV_JOYSTICK
@@ -112,7 +114,7 @@ void Receiver::emergency_stop(Arm &arm, Motor &motor) {
         arm.set_arm_status(false);
         motor.stop_motor();
     }
-    if (disconnect_count > 10) {
+    if (disconnect_count > 10 || checksum_success == false || first_byte_check == false) {
         arm.set_arm_status(false);
         motor.stop_motor();
     }

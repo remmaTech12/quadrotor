@@ -26,7 +26,7 @@ class PID {
     // Calculated value: roll, pitch, yaw
     float pid_rpy[3] = {0.0f, 0.0f, 0.0f};
 
-    void calculate_rpy();
+    void calculate_id_term();
 };
 
 #endif  // #ifndef PID_h
