@@ -29,6 +29,7 @@ class imu_bmx055 {
 
     void setup();
     void get_attitude_data(float data[3]);
+    void get_angvel_data(float data[3]);
 
     void print_all_data();
     void print_accel_data();

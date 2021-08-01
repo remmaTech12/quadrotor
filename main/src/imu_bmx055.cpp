@@ -96,6 +96,13 @@ void imu_bmx055::get_attitude_data(float data[3]) {
     data[2] = yaw;
 }
 
+void imu_bmx055::get_angvel_data(float data[3]) {
+    calculate_gyro();
+    data[0] = xGyro;
+    data[1] = yGyro;
+    data[2] = zGyro;
+}
+
 void imu_bmx055::print_all_data() {
     Serial.println("--------------------------------------");
 

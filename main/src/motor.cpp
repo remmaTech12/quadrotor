@@ -117,20 +117,33 @@ void Motor::format_pid_data(float pid_data[3]) {
 #endif
 }
 
-void Motor::control(int cmd_data[4], float pid_data[3], Arm &arm) {
+void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
     if (arm.get_arm_status() == false) { 
         stop_motor();
         return;
     }
 
-    format_cmd_data(cmd_data);
-    format_pid_data(pid_data);
-
-    float pid_ratio = 0.45;
     int motor_data[4] = {0, 0, 0, 0};
 
+    int cmd_thrust = cmd_data[0];
+    limit_command(cmd_thrust, 0, LIMIT_MOTOR/2.0f);
+
+    //format_cmd_data(cmd_data);
+    //format_pid_data(pid_data);
+
+    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + cmd_thrust;
+    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + cmd_thrust;
+    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2] + cmd_thrust;
+    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2] + cmd_thrust;
+
+    for (int i = 0; i < 4; i++) {
+        limit_command(m_recv_cmd[i], 0, LIMIT_MOTOR);
+    };
+
+    //float pid_ratio = 0.45;
+
     for (int i=0; i<4; i++) {
-        motor_data[i] = m_pid_cmd[i]*pid_ratio + m_recv_cmd[i]*(1.0f-pid_ratio);
+        //motor_data[i] = m_pid_cmd[i]*pid_ratio + m_recv_cmd[i]*(1.0f-pid_ratio);
         ledcWrite(i, motor_data[i]);
     }
 
