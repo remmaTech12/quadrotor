@@ -123,27 +123,35 @@ void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
         return;
     }
 
-    int motor_data[4] = {0, 0, 0, 0};
+    /*
+    Serial.print("roll: ");
+    Serial.print(ctl_data[0]);
+    Serial.print(", pitch: ");
+    Serial.print(ctl_data[1]);
+    Serial.print(", yaw: ");
+    Serial.println(ctl_data[2]);
+    */
 
-    int cmd_thrust = cmd_data[0];
-    limit_command(cmd_thrust, 0, LIMIT_MOTOR/2.0f);
+    int motor_data[4] = {0, 0, 0, 0};
 
     //format_cmd_data(cmd_data);
     //format_pid_data(pid_data);
 
-    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + cmd_thrust;
-    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + cmd_thrust;
-    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2] + cmd_thrust;
-    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2] + cmd_thrust;
+    int cmd_thrust = cmd_data[0]*0.55;
+    limit_command(cmd_thrust, 0, LIMIT_MOTOR*0.55);
+
+    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2];
+    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2];
+    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2];
+    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2];
 
     for (int i = 0; i < 4; i++) {
-        limit_command(m_recv_cmd[i], 0, LIMIT_MOTOR);
+        limit_command(motor_data[i], 0, LIMIT_MOTOR/2.0f);
+        motor_data[i] += cmd_thrust;
+        limit_command(motor_data[i], 0, LIMIT_MOTOR);
     };
 
-    //float pid_ratio = 0.45;
-
     for (int i=0; i<4; i++) {
-        //motor_data[i] = m_pid_cmd[i]*pid_ratio + m_recv_cmd[i]*(1.0f-pid_ratio);
         ledcWrite(i, motor_data[i]);
     }
 

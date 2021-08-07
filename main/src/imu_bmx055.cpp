@@ -240,7 +240,7 @@ void imu_bmx055::calculate_mag() {
 void imu_bmx055::calculate_attitude() {
     calculate_accel();
     calculate_gyro();
-    print_attitude_data();
+    //print_attitude_data();
     //calculate_mag();
     //madgwick.update(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl,xMag,yMag,zMag);
     madgwick.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
