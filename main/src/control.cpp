@@ -4,18 +4,33 @@ Control::Control() {}
 
 void Control::setup() {}
 
+void Control::calculate_bias() {
+    if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
+        for (int i=0; i<3; i++) {
+            ctl_bias_sum_data_[i] += angvel_ctl_data_[i];
+        }
+    } else {
+        for (int i=0; i<3; i++) {
+            ctl_bias_ave_data_[i] = ctl_bias_sum_data_[i] / cnt_total_num;
+            angvel_ctl_data_[i] -= ctl_bias_ave_data_[i];
+        }
+    }
+}
+
 void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
     float ref_data[3];
-    float out_data[3];
+    float out_data[3] = {0.0f, 0.0f, 0.0f};
     for (int i=3; i>0; i--) {
-        ref_data[3-i] = (float) (cmd_data[i] - 127.0f) / 4.0f;
+        ref_data[3-i] = (float) (cmd_data[i] - 127.0f) / 50.0f;
     }
-    double bias_roll_ang  = 0.1;
-    double bias_pitch_ang = 2.0;
-    //ang_data[0] -= bias_roll_ang;
-    //ang_data[1] -= bias_pitch_ang;
 
 /*
+    Serial.print("roll: ");
+    Serial.print(ref_data[0]);
+    Serial.print(", pitch: ");
+    Serial.print(ref_data[1]);
+    Serial.print(", yaw: ");
+    Serial.println(ref_data[2]);
     Serial.print("roll: ");
     Serial.print(ang_data[0]);
     Serial.print(", pitch: ");
@@ -24,19 +39,18 @@ void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
     Serial.println(ang_data[2]);
     */
 
-    calculate_pid(ref_data, ang_data, err_ang_data_i_, pre_ang_data_, pre_filtered_ang_dterm_data_, out_data, Kp_ang_, Ki_ang_, Kd_ang_);
+    if (cnt > cnt_total_num + cnt_total_num) {
+        calculate_pid(ref_data, ang_data, err_ang_data_i_, pre_ang_data_, pre_filtered_ang_dterm_data_, out_data, Kp_ang_, Ki_ang_, Kd_ang_);
+    }
 
     for (int i=0; i<3; i++) {
-        limit_val(out_data[i], -1.0f*180, 1.0f*180);
+    limit_val(out_data[i], -1.0f*180, 1.0f*180);
         ang_ref_data_[i] = out_data[i];
     }
 }
 
 void Control::calculate_pid_angvel(float angvel_data[3]) {
-    float out_data[3];
-
-    double bias_pitch_angvel = -0.15;
-    //angvel_data[1] -= bias_pitch_angvel;
+    float out_data[3] = {0.0f, 0.0f, 0.0f};
 
 /*
     Serial.print("roll: ");
@@ -47,9 +61,11 @@ void Control::calculate_pid_angvel(float angvel_data[3]) {
     Serial.println(angvel_data[2]);
     */
 
-    calculate_pid(ang_ref_data_, angvel_data, err_angvel_data_i_, pre_angvel_data_, pre_filtered_angvel_dterm_data_, out_data, Kp_angvel_, Ki_angvel_, Kd_angvel_);
+    if (cnt > cnt_start_num) {
+        calculate_pid(ang_ref_data_, angvel_data, err_angvel_data_i_, pre_angvel_data_, pre_filtered_angvel_dterm_data_, out_data, Kp_angvel_, Ki_angvel_, Kd_angvel_);
+    }
 
-    float filtered_out_data[3];
+    float filtered_out_data[3] = {0.0f, 0.0f, 0.0f};
     double cutoff_freq = 10;
     low_pass_filter(cutoff_freq, pre_filtered_control_data_,out_data, filtered_out_data);
 
@@ -74,7 +90,7 @@ void Control::calculate_pid(float ref_data[3], float cur_data[3], float err_data
         pre_data[i] = cur_data[i];
     }
 
-    float filtered_data_d[3];
+    float filtered_data_d[3] = {0.0f, 0.0f, 0.0f};
     float cutoff_freq = 1.0f;
     low_pass_filter(cutoff_freq, pre_filtered_dterm_data, data_d, filtered_data_d);
 
@@ -102,6 +118,8 @@ void Control::low_pass_filter(float cutoff_freq, float pre_filtered_data[3], flo
 }
 
 void Control::get_control_val(float ctl_data[3]) {
+    cnt++;
+//    calculate_bias();
     ctl_data[0] = angvel_ctl_data_[0];
     ctl_data[1] = angvel_ctl_data_[1];
     ctl_data[2] = angvel_ctl_data_[2];

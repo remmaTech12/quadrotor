@@ -191,6 +191,20 @@ void imu_bmx055::calculate_accel() {
     xAccl = xAccl * 0.0098;  // renge +-2g
     yAccl = yAccl * 0.0098;  // renge +-2g
     zAccl = zAccl * 0.0098;  // renge +-2g
+
+    if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
+        xAcclBiasSum += xAccl;
+        yAcclBiasSum += yAccl;
+        zAcclBiasSum += zAccl;
+    } else {
+        xAcclBiasAve = xAcclBiasSum / cnt_total_num;
+        yAcclBiasAve = yAcclBiasSum / cnt_total_num;
+        zAcclBiasAve = zAcclBiasSum / cnt_total_num;
+
+        xAccl -= xAcclBiasAve;  //  Full scale = +/- 125 degree/s
+        yAccl -= yAcclBiasAve;  //  Full scale = +/- 125 degree/s
+        zAccl -= zAcclBiasAve - 9.8;  //  Full scale = +/- 125 degree/s
+    }
 }
 
 void imu_bmx055::calculate_gyro() {
@@ -215,6 +229,20 @@ void imu_bmx055::calculate_gyro() {
     xGyro = xGyro * 0.0038;  //  Full scale = +/- 125 degree/s
     yGyro = yGyro * 0.0038;  //  Full scale = +/- 125 degree/s
     zGyro = zGyro * 0.0038;  //  Full scale = +/- 125 degree/s
+
+    if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
+        xGyroBiasSum += xGyro;
+        yGyroBiasSum += yGyro;
+        zGyroBiasSum += zGyro;
+    } else {
+        xGyroBiasAve = xGyroBiasSum / cnt_total_num;
+        yGyroBiasAve = yGyroBiasSum / cnt_total_num;
+        zGyroBiasAve = zGyroBiasSum / cnt_total_num;
+
+        xGyro -= xGyroBiasAve;  //  Full scale = +/- 125 degree/s
+        yGyro -= yGyroBiasAve;  //  Full scale = +/- 125 degree/s
+        zGyro -= zGyroBiasAve;  //  Full scale = +/- 125 degree/s
+    }
 }
 
 void imu_bmx055::calculate_mag() {
@@ -238,6 +266,7 @@ void imu_bmx055::calculate_mag() {
 }
 
 void imu_bmx055::calculate_attitude() {
+    cnt++;
     calculate_accel();
     calculate_gyro();
     //print_attitude_data();
@@ -247,4 +276,13 @@ void imu_bmx055::calculate_attitude() {
     roll  = madgwick.getRoll();
     pitch = madgwick.getPitch();
     yaw   = madgwick.getYaw() - 180.0f;
+
+/*
+    Serial.print("roll: ");
+    Serial.print(xGyro);
+    Serial.print(", pitch: ");
+    Serial.print(yGyro);
+    Serial.print(", yaw: ");
+    Serial.println(zGyro);
+    */
 }
