@@ -270,19 +270,17 @@ void imu_bmx055::calculate_attitude() {
     calculate_accel();
     calculate_gyro();
     //print_attitude_data();
-    //calculate_mag();
-    //madgwick.update(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl,xMag,yMag,zMag);
-    madgwick.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
+    calculate_mag();
+    madgwick.update(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl,xMag,yMag,zMag);
+    //madgwick.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
     roll  = madgwick.getRoll();
     pitch = madgwick.getPitch();
     yaw   = madgwick.getYaw() - 180.0f;
 
-/*
     Serial.print("roll: ");
-    Serial.print(xGyro);
+    Serial.print(roll);
     Serial.print(", pitch: ");
-    Serial.print(yGyro);
+    Serial.print(pitch);
     Serial.print(", yaw: ");
-    Serial.println(zGyro);
-    */
+    Serial.println(yaw);
 }
