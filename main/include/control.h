@@ -21,7 +21,7 @@ class Control {
     void calculate_bias();
 
     // Gain for angles: roll, pitch, yaw
-    float Kp_ang_[3] = { 0.65f,  0.65f,  0.50f};
+    float Kp_ang_[3] = { 0.60f,  0.60f,  0.50f};
     float Ki_ang_[3] = { 0.0f,  0.0f,  0.0f};
     float Kd_ang_[3] = { 0.0f,  0.0f,  0.0f};
     /*
@@ -31,9 +31,9 @@ class Control {
     */
 
     // Gain for angular velocities: roll, pitch, yaw
-    float Kp_angvel_[3] = { 0.45f,  0.45f,  0.3f};
-    float Ki_angvel_[3] = { 0.005f,  0.005f,  0.001f};
-    float Kd_angvel_[3] = { 0.0f,  0.0f,  0.0f};
+    float Kp_angvel_[3] = { 0.07f,  0.07f,  0.05f};
+    float Ki_angvel_[3] = { 0.035f,  0.035f,  0.02f};
+    float Kd_angvel_[3] = { 0.01f,  0.01f,  0.01f};
     /*
     float Kp_angvel_[3] = { 0.45f,  0.45f,  0.3f};
     float Ki_angvel_[3] = { 0.01f,  0.01f,  0.005f};
@@ -63,7 +63,7 @@ class Control {
     float ctl_bias_sum_data_[3] = {0.0f, 0.0f, 0.0f};
     float ctl_bias_ave_data_[3] = {0.0f, 0.0f, 0.0f};
     int cnt = 0;
-    int cnt_start_num = 500;
+    int cnt_start_num = 200;
     int cnt_total_num = 200;
 };
 

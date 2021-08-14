@@ -69,8 +69,8 @@ class imu_bmx055 {
     float sample_frequency;
 
     int cnt = 0;
-    int cnt_start_num = 300;
-    int cnt_total_num = 200;
+    int cnt_start_num = 100;
+    int cnt_total_num = 100;
 
     void calculate_accel();
     void calculate_gyro();

@@ -132,14 +132,20 @@ void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
 
     int motor_data[4] = {0, 0, 0, 0};
 
-    double thrust_scale = 0.5;
+    double thrust_scale = 0.55;
+    if (cmd_data[0] < 50) {
+        cmd_data[0] *= 3;
+    } else {
+        cmd_data[0] = 105.0f / 205.0f * (cmd_data[0] - 50.0f) + 150.0f;
+    }
     int cmd_thrust = cmd_data[0]*thrust_scale;
     limit_command(cmd_thrust, 0, LIMIT_MOTOR*thrust_scale);
 
-    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2];
-    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2];
-    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2];
-    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2];
+    double offset_motor[4] = {13.0f, 0.0f, 5.0f, 16.0f};
+    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + offset_motor[0];
+    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + offset_motor[1];
+    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2] + offset_motor[2];
+    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2] + offset_motor[3];
 
     for (int i = 0; i < 4; i++) {
         limit_command(motor_data[i], 0, LIMIT_MOTOR/2.0f);
