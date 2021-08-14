@@ -44,11 +44,10 @@ void loop() {
 
     //pid.calculate_pid(rpy_data);
     //pid.get_pid(pid_data);
-    if (arm.get_arm_status()) {
-        control.calculate_pid_ang(cmd_data, ang_data);
-        control.calculate_pid_angvel(angvel_data);
-        control.get_control_val(ctl_data);
-    }
+    control.calculate_pid_ang(cmd_data, ang_data);
+    control.calculate_pid_angvel(angvel_data);
+    control.calculate_and_remove_bias();
+    control.get_control_val(ctl_data);
 
     motor.control(cmd_data, ctl_data, arm);
     //motor.test_control(128);

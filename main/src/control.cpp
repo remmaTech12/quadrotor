@@ -4,7 +4,7 @@ Control::Control() {}
 
 void Control::setup() {}
 
-void Control::calculate_bias() {
+void Control::calculate_and_remove_bias() {
     if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
         for (int i=0; i<3; i++) {
             ctl_bias_sum_data_[i] += angvel_ctl_data_[i];
@@ -15,33 +15,17 @@ void Control::calculate_bias() {
             angvel_ctl_data_[i] -= ctl_bias_ave_data_[i];
         }
     }
+    cnt++;
 }
 
 void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
     float ref_data[3];
     float out_data[3] = {0.0f, 0.0f, 0.0f};
-    for (int i=3; i>0; i--) {
-        ref_data[3-i] = (float) (cmd_data[i] - 127.0f) / 50.0f;
-    }
+    ref_data[0] = (float) (cmd_data[3] - 127.0f) / 2.0f;
+    ref_data[1] = (float) (cmd_data[2] - 127.0f) / 2.0f;
+    ref_data[2] = (float) (cmd_data[1] - 127.0f) / 50.0f;
 
-/*
-    Serial.print("roll: ");
-    Serial.print(ref_data[0]);
-    Serial.print(", pitch: ");
-    Serial.print(ref_data[1]);
-    Serial.print(", yaw: ");
-    Serial.println(ref_data[2]);
-    Serial.print("roll: ");
-    Serial.print(ang_data[0]);
-    Serial.print(", pitch: ");
-    Serial.print(ang_data[1]);
-    Serial.print(", yaw: ");
-    Serial.println(ang_data[2]);
-    */
-
-    if (cnt > cnt_total_num + cnt_total_num) {
-        calculate_pid(ref_data, ang_data, err_ang_data_i_, pre_ang_data_, pre_filtered_ang_dterm_data_, out_data, Kp_ang_, Ki_ang_, Kd_ang_);
-    }
+    calculate_pid(ref_data, ang_data, err_ang_data_i_, pre_ang_data_, pre_filtered_ang_dterm_data_, out_data, Kp_ang_, Ki_ang_, Kd_ang_);
 
     for (int i=0; i<3; i++) {
     limit_val(out_data[i], -1.0f*180, 1.0f*180);
@@ -52,18 +36,7 @@ void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
 void Control::calculate_pid_angvel(float angvel_data[3]) {
     float out_data[3] = {0.0f, 0.0f, 0.0f};
 
-/*
-    Serial.print("roll: ");
-    Serial.print(angvel_data[0]);
-    Serial.print(", pitch: ");
-    Serial.print(angvel_data[1]);
-    Serial.print(", yaw: ");
-    Serial.println(angvel_data[2]);
-    */
-
-    if (cnt > cnt_start_num) {
-        calculate_pid(ang_ref_data_, angvel_data, err_angvel_data_i_, pre_angvel_data_, pre_filtered_angvel_dterm_data_, out_data, Kp_angvel_, Ki_angvel_, Kd_angvel_);
-    }
+    calculate_pid(ang_ref_data_, angvel_data, err_angvel_data_i_, pre_angvel_data_, pre_filtered_angvel_dterm_data_, out_data, Kp_angvel_, Ki_angvel_, Kd_angvel_);
 
     float filtered_out_data[3] = {0.0f, 0.0f, 0.0f};
     double cutoff_freq = 10;
@@ -107,7 +80,8 @@ void Control::limit_val(float &val, float min, float max) {
 void Control::low_pass_filter(float cutoff_freq, float pre_filtered_data[3], float cur_data[3], float filtered_data[3]) {
     float Tsamp = SAMPLING_TIME_MS / 1000.0f;
     float tau   = 1.0f / (2.0f * M_PI * cutoff_freq);
-    float kpre  = tau / (Tsamp + tau);
+    //float kpre  = tau / (Tsamp + tau);
+    float kpre = kpre = 0.4;
     // reference: https://qiita.com/motorcontrolman/items/39d4abc6c4862817e646
     // cutoff_freq = 1000: kpre = 0.0157
 
@@ -118,9 +92,16 @@ void Control::low_pass_filter(float cutoff_freq, float pre_filtered_data[3], flo
 }
 
 void Control::get_control_val(float ctl_data[3]) {
-    cnt++;
-//    calculate_bias();
     ctl_data[0] = angvel_ctl_data_[0];
     ctl_data[1] = angvel_ctl_data_[1];
     ctl_data[2] = angvel_ctl_data_[2];
 }
+
+/*
+    Serial.print("roll: ");
+    Serial.print(angvel_data[0]);
+    Serial.print(", pitch: ");
+    Serial.print(angvel_data[1]);
+    Serial.print(", yaw: ");
+    Serial.println(angvel_data[2]);
+    */
