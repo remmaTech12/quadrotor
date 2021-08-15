@@ -277,10 +277,19 @@ void imu_bmx055::calculate_attitude() {
     pitch = madgwick.getPitch();
     yaw   = madgwick.getYaw() - 180.0f;
 
+    if (cnt > cnt_start_num + cnt_total_num && cnt <= cnt_start_num + cnt_total_num + cnt_yaw_num) {
+        yawBiasSum += yaw;
+    } else {
+        yawBiasAve = yawBiasSum / cnt_yaw_num;
+        yaw -= yawBiasAve;
+    }
+
+/*
     Serial.print("roll: ");
     Serial.print(roll);
     Serial.print(", pitch: ");
     Serial.print(pitch);
     Serial.print(", yaw: ");
     Serial.println(yaw);
+    */
 }

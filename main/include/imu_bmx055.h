@@ -57,6 +57,7 @@ class imu_bmx055 {
     float xGyroBiasSum = 0.00;
     float yGyroBiasSum = 0.00;
     float zGyroBiasSum = 0.00;
+    float yawBiasSum   = 0.00;
 
     float xAcclBiasAve = 0.00;
     float yAcclBiasAve = 0.00;
@@ -64,6 +65,7 @@ class imu_bmx055 {
     float xGyroBiasAve = 0.00;
     float yGyroBiasAve = 0.00;
     float zGyroBiasAve = 0.00;
+    float yawBiasAve   = 0.00;
 
     Madgwick madgwick;
     float sample_frequency;
@@ -71,6 +73,7 @@ class imu_bmx055 {
     int cnt = 0;
     int cnt_start_num = 100;
     int cnt_total_num = 100;
+    int cnt_yaw_num   = 100;
 
     void calculate_accel();
     void calculate_gyro();
