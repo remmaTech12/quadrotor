@@ -27,7 +27,7 @@ class Control {
 
     // Gain for angular velocities: roll, pitch, yaw
     float Kp_angvel_[3] = { 0.07f,  0.07f,  0.05f};
-    float Ki_angvel_[3] = { 0.032f,  0.033f,  0.02f};
+    float Ki_angvel_[3] = { 0.05f,  0.05f,  0.03f};
     float Kd_angvel_[3] = { 0.01f,  0.01f,  0.01f};
 
     // I values
@@ -53,7 +53,7 @@ class Control {
     float ctl_bias_sum_data_[3] = {0.0f, 0.0f, 0.0f};
     float ctl_bias_ave_data_[3] = {0.0f, 0.0f, 0.0f};
     int cnt = 0;
-    int cnt_start_num = 200;
+    int cnt_start_num = 300;
     int cnt_total_num = 100;
 };
 
