@@ -23,7 +23,9 @@ void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
     float out_data[3] = {0.0f, 0.0f, 0.0f};
     ref_data[0] = (float) (cmd_data[3] - 127.0f) / 2.0f;
     ref_data[1] = (float) (cmd_data[2] - 127.0f) / 2.0f;
-    ref_data[2] = (float) (cmd_data[1] - 127.0f) / 50.0f;
+
+    if (cmd_data[0] > 70) ref_data[2] = (float) (cmd_data[1] - 127.0f) / 50.0f;
+    else ref_data[2] = 0;
 
     calculate_pid(ref_data, ang_data, err_ang_data_i_, pre_ang_data_, pre_filtered_ang_dterm_data_, out_data, Kp_ang_, Ki_ang_, Kd_ang_);
 
