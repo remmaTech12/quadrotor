@@ -123,34 +123,35 @@ void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
         return;
     }
 
-/*
     Serial.print("roll_ctrl: ");
-    Serial.print(ctl_data[0]);
+    Serial.print(cmd_data[0]);
     Serial.print(", pitch_ctrl: ");
-    Serial.print(ctl_data[1]);
+    Serial.print(cmd_data[1]);
     Serial.print(", yaw_ctrl: ");
-    Serial.println(ctl_data[2]);
-    */
+    Serial.println(cmd_data[2]);
 
     int motor_data[4] = {0, 0, 0, 0};
 
     double thrust_scale = 0.5;
-    if (cmd_data[0] < 50) {
+    double kth = 30;
+    if (cmd_data[0] < kth) {
         cmd_data[0] *= 3;
     } else {
-        cmd_data[0] = 105.0f / 205.0f * (cmd_data[0] - 50.0f) + 150.0f;
+        cmd_data[0] = ((LIMIT_MOTOR - 3*kth) / (LIMIT_MOTOR - kth)) * (cmd_data[0] - kth) + 3*kth;
     }
     int cmd_thrust = cmd_data[0]*thrust_scale;
     limit_command(cmd_thrust, 0, LIMIT_MOTOR*thrust_scale);
 
-    double offset_motor[4] = {18.0f, 0.0f, 5.0f, 21.0f};
+    //double offset_motor[4] = {18.0f, 0.0f, 5.0f, 21.0f};
+    double offset_motor[4] = {15.0f, 0.0f, 0.0f, 15.0f};
     motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + offset_motor[0];
     motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + offset_motor[1];
     motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2] + offset_motor[2];
     motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2] + offset_motor[3];
 
     for (int i = 0; i < 4; i++) {
-        limit_command(motor_data[i], 0, LIMIT_MOTOR/2.0f);
+        double ctl_limit = LIMIT_MOTOR * (1.0f - thrust_scale);
+        limit_command(motor_data[i], 0, ctl_limit);
         motor_data[i] += cmd_thrust;
         limit_command(motor_data[i], 0, LIMIT_MOTOR);
     };
