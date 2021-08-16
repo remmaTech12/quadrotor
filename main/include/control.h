@@ -21,14 +21,14 @@ class Control {
     void low_pass_filter(float cutoff_freq,float pre_filtered_data[3],  float cur_data[3], float filtered_data[3]);
 
     // Gain for angles: roll, pitch, yaw
-    float Kp_ang_[3] = { 0.60f,  0.60f,  0.50f};
+    float Kp_ang_[3] = { 0.60f,  0.60f,  0.60f};
     float Ki_ang_[3] = { 0.0f,  0.0f,  0.0f};
     float Kd_ang_[3] = { 0.0f,  0.0f,  0.0f};
 
     // Gain for angular velocities: roll, pitch, yaw
-    float Kp_angvel_[3] = { 0.07f,  0.07f,  0.05f};
-    float Ki_angvel_[3] = { 0.05f,  0.05f,  0.03f};
-    float Kd_angvel_[3] = { 0.01f,  0.01f,  0.01f};
+    float Kp_angvel_[3] = { 0.07f,  0.07f,  0.07f};
+    float Ki_angvel_[3] = { 0.02f,  0.02f,  0.02f};
+    float Kd_angvel_[3] = { 0.017f,  0.017f,  0.017f};
 
     // I values
     float err_ang_data_i_[3]    = {0.0f, 0.0f, 0.0f};
