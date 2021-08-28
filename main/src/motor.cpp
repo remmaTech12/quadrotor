@@ -172,7 +172,7 @@ int Motor::calculate_thrust(double thrust_scale, int cmd_data[4]) {
 }
 
 void Motor::calculate_motor_control(float ctl_data[3], int motor_data[4]) {
-    double offset_motor[4] = {15.0f, 0.0f, 15.0f, 25.0f};
+    double offset_motor[4] = {22.0f, 0.0f, 23.0f, 32.0f};
     //double offset_motor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + offset_motor[0];
     motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + offset_motor[1];

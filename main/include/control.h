@@ -26,7 +26,7 @@ class Control {
     float Kd_ang_[3] = { 0.0f,  0.0f,  0.0f};
 
     // Gain for angular velocities: roll, pitch, yaw
-    float Kp_angvel_[3] = { 0.55f,  0.55f,  0.5f};
+    float Kp_angvel_[3] = { 0.5f,  0.5f,  0.5f};
     float Ki_angvel_[3] = { 0.0f,  0.0f,  0.0f};
     float Kd_angvel_[3] = { 0.0f,  0.0f,  0.0f};
 
