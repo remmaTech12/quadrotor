@@ -9,8 +9,8 @@ class Motor {
     Motor();
 
     void setup();
-    void test_control(int motor_val);
-    void test_count();
+    //void test_control(int motor_val);
+    //void test_count();
     void control(int cmd_data[4], float pid_rpy[3], Arm &arm);
     void stop_motor();
 
@@ -21,10 +21,12 @@ class Motor {
     int tcount = 0;
     int pre_button = LOW;
 
-    void format_cmd_data(int cmd_data[4]);
-    void format_pid_data(float pid_rpy[3]);
+    //void format_cmd_data(int cmd_data[4]);
+    //void format_pid_data(float pid_rpy[3]);
     void limit_command(int &cmd, int min, int max);
-    void debug_print(int data[4]);
+    //void debug_print(int data[4]);
+    int calculate_thrust(double thrust_scale, int cmd_data[4]);
+    void calculate_motor_control(float ctl_data[3], int motor_data[4]);
 };
 
 #endif  // #ifndef Motor_h

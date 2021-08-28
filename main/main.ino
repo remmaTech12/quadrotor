@@ -39,19 +39,20 @@ void loop() {
     receiver.emergency_stop(arm, motor);
 
     imu.get_attitude_data(ang_data);
-    //imu.print_attitude_data();
     imu.get_angvel_data(angvel_data);
 
-    //pid.calculate_pid(rpy_data);
-    //pid.get_pid(pid_data);
     control.calculate_pid_ang(cmd_data, ang_data);
     control.calculate_pid_angvel(angvel_data);
-    control.calculate_and_remove_bias();
+    //control.calculate_and_remove_bias(arm.get_arm_status());
     control.get_control_val(ctl_data);
 
-    motor.control(cmd_data, ctl_data, arm);
-    //motor.test_control(128);
-    //motor.test_count();
+    /*
+    unsigned long time = millis();
+    Serial.print("time: ");
+    Serial.println(time);
+    */
 
-    delay(SAMPLING_TIME_MS);
+    motor.control(cmd_data, ctl_data, arm);
+
+    //delay(SAMPLING_TIME_MS);
 }

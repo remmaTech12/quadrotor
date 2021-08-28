@@ -15,11 +15,16 @@
 
 
 // System setting
-#define SAMPLING_TIME_MS 10
+#define SAMPLING_TIME_MS 14
 #define RECEIVE_DATA_SIZE 7
 #define PID_MAX 2000
 #define LIMIT_MOTOR 255
 
+// Bias removal time
+#define IMU_CNT_START_NUM 100
+#define IMU_CNT_TOTAL_NUM 100
+#define CTL_CNT_START_NUM 150
+#define CTL_CNT_TOTAL_NUM 100
 
 // Debug setting
 //#define DEBUG_RECV_SWITCH

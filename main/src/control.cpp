@@ -4,18 +4,18 @@ Control::Control() {}
 
 void Control::setup() {}
 
-void Control::calculate_and_remove_bias() {
-    if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
+void Control::calculate_and_remove_bias(bool is_armed) {
+    if (cnt > CTL_CNT_START_NUM && cnt <= CTL_CNT_START_NUM + CTL_CNT_TOTAL_NUM) {
         for (int i=0; i<3; i++) {
             ctl_bias_sum_data_[i] += angvel_ctl_data_[i];
         }
-    } else {
+    } else if (cnt > CTL_CNT_START_NUM + CTL_CNT_TOTAL_NUM) {
         for (int i=0; i<3; i++) {
-            ctl_bias_ave_data_[i] = ctl_bias_sum_data_[i] / cnt_total_num;
+            ctl_bias_ave_data_[i] = ctl_bias_sum_data_[i] / CTL_CNT_TOTAL_NUM;
             angvel_ctl_data_[i] -= ctl_bias_ave_data_[i];
         }
     }
-    cnt++;
+    if (is_armed) cnt++;
 }
 
 void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
@@ -24,13 +24,14 @@ void Control::calculate_pid_ang(int cmd_data[4], float ang_data[3]) {
     ref_data[0] = (float) (cmd_data[3] - 127.0f) / 2.0f;
     ref_data[1] = (float) (cmd_data[2] - 127.0f) / 2.0f;
 
-    if (cmd_data[0] > 70) ref_data[2] = (float) (cmd_data[1] - 127.0f) / 50.0f;
-    else ref_data[2] = 0;
+    double yaw_input_in_arm_threshold = 200;
+    if (cmd_data[0] > yaw_input_in_arm_threshold) ref_data[2] = 0;
+    else ref_data[2] = (float) (cmd_data[1] - 127.0f) / 2.0f;
 
     calculate_pid(ref_data, ang_data, err_ang_data_i_, pre_ang_data_, pre_filtered_ang_dterm_data_, out_data, Kp_ang_, Ki_ang_, Kd_ang_);
 
     for (int i=0; i<3; i++) {
-    limit_val(out_data[i], -1.0f*180, 1.0f*180);
+    limit_val(out_data[i], -1.0f*30, 1.0f*30);
         ang_ref_data_[i] = out_data[i];
     }
 }
@@ -45,7 +46,7 @@ void Control::calculate_pid_angvel(float angvel_data[3]) {
     low_pass_filter(cutoff_freq, pre_filtered_control_data_,out_data, filtered_out_data);
 
     for (int i=0; i<3; i++) {
-        limit_val(out_data[i], -1.0f*180, 1.0f*180);
+        limit_val(out_data[i], -1.0f*50, 1.0f*50);
         angvel_ctl_data_[i] = out_data[i];
     }
 }
@@ -98,12 +99,3 @@ void Control::get_control_val(float ctl_data[3]) {
     ctl_data[1] = angvel_ctl_data_[1];
     ctl_data[2] = angvel_ctl_data_[2];
 }
-
-/*
-    Serial.print("roll: ");
-    Serial.print(angvel_data[0]);
-    Serial.print(", pitch: ");
-    Serial.print(angvel_data[1]);
-    Serial.print(", yaw: ");
-    Serial.println(angvel_data[2]);
-    */

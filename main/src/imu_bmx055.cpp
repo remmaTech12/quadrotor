@@ -192,14 +192,14 @@ void imu_bmx055::calculate_accel() {
     yAccl = yAccl * 0.0098;  // renge +-2g
     zAccl = zAccl * 0.0098;  // renge +-2g
 
-    if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
+    if (cnt > IMU_CNT_START_NUM && cnt <= IMU_CNT_START_NUM + IMU_CNT_TOTAL_NUM) {
         xAcclBiasSum += xAccl;
         yAcclBiasSum += yAccl;
         zAcclBiasSum += zAccl;
-    } else {
-        xAcclBiasAve = xAcclBiasSum / cnt_total_num;
-        yAcclBiasAve = yAcclBiasSum / cnt_total_num;
-        zAcclBiasAve = zAcclBiasSum / cnt_total_num;
+    } else if (cnt > IMU_CNT_START_NUM + IMU_CNT_TOTAL_NUM) {
+        xAcclBiasAve = xAcclBiasSum / IMU_CNT_TOTAL_NUM;
+        yAcclBiasAve = yAcclBiasSum / IMU_CNT_TOTAL_NUM;
+        zAcclBiasAve = zAcclBiasSum / IMU_CNT_TOTAL_NUM;
 
         xAccl -= xAcclBiasAve;  //  Full scale = +/- 125 degree/s
         yAccl -= yAcclBiasAve;  //  Full scale = +/- 125 degree/s
@@ -230,14 +230,14 @@ void imu_bmx055::calculate_gyro() {
     yGyro = yGyro * 0.0038;  //  Full scale = +/- 125 degree/s
     zGyro = zGyro * 0.0038;  //  Full scale = +/- 125 degree/s
 
-    if (cnt > cnt_start_num && cnt <= cnt_start_num + cnt_total_num) {
+    if (cnt > IMU_CNT_START_NUM && cnt <= IMU_CNT_START_NUM + IMU_CNT_TOTAL_NUM) {
         xGyroBiasSum += xGyro;
         yGyroBiasSum += yGyro;
         zGyroBiasSum += zGyro;
-    } else {
-        xGyroBiasAve = xGyroBiasSum / cnt_total_num;
-        yGyroBiasAve = yGyroBiasSum / cnt_total_num;
-        zGyroBiasAve = zGyroBiasSum / cnt_total_num;
+    } else if (cnt > IMU_CNT_START_NUM + IMU_CNT_TOTAL_NUM) {
+        xGyroBiasAve = xGyroBiasSum / IMU_CNT_TOTAL_NUM;
+        yGyroBiasAve = yGyroBiasSum / IMU_CNT_TOTAL_NUM;
+        zGyroBiasAve = zGyroBiasSum / IMU_CNT_TOTAL_NUM;
 
         xGyro -= xGyroBiasAve;  //  Full scale = +/- 125 degree/s
         yGyro -= yGyroBiasAve;  //  Full scale = +/- 125 degree/s
@@ -269,13 +269,13 @@ void imu_bmx055::calculate_attitude() {
     cnt++;
     calculate_accel();
     calculate_gyro();
-    //print_attitude_data();
     calculate_mag();
     madgwick.update(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl,xMag,yMag,zMag);
     //madgwick.updateIMU(xGyro,yGyro,zGyro,xAccl,yAccl,zAccl);
     roll  = madgwick.getRoll();
     pitch = madgwick.getPitch();
     yaw   = madgwick.getYaw() - 180.0f;
+    //print_attitude_data();
 
 /*
     if (cnt > cnt_start_num + cnt_total_num && cnt <= cnt_start_num + cnt_total_num + cnt_yaw_num) {
@@ -284,14 +284,5 @@ void imu_bmx055::calculate_attitude() {
         yawBiasAve = yawBiasSum / cnt_yaw_num;
         yaw -= yawBiasAve;
     }
-    */
-
-/*
-    Serial.print("roll: ");
-    Serial.print(roll);
-    Serial.print(", pitch: ");
-    Serial.print(pitch);
-    Serial.print(", yaw: ");
-    Serial.println(yaw);
     */
 }

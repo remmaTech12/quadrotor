@@ -29,6 +29,7 @@ void Motor::setup() {
     }
 }
 
+/*
 void Motor::test_control(int motor_val) {
     int test_motor_val = motor_val;
     if (digitalRead(EMERGENCY_SWITCH) == LOW) {
@@ -56,6 +57,7 @@ void Motor::test_count() {
 
     pre_button = digitalRead(EMERGENCY_SWITCH);
 }
+*/
 
 void Motor::limit_command(int &cmd, int min, int max) {
     if (cmd > max) { cmd = max; }
@@ -68,6 +70,7 @@ void Motor::stop_motor() {
     }
 }
 
+/*
 void Motor::debug_print(int data[4]) {
     Serial.print("thrust: ");
     Serial.print(data[0]);
@@ -116,6 +119,7 @@ void Motor::format_pid_data(float pid_data[3]) {
     debug_print(m_pid_cmd);
 #endif
 }
+*/
 
 void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
     if (arm.get_arm_status() == false) { 
@@ -131,24 +135,11 @@ void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
     Serial.println(ctl_data[2]);
 
     int motor_data[4] = {0, 0, 0, 0};
+    int cmd_thrust = 0;
+    double thrust_scale = 0.65;
 
-    double thrust_scale = 0.5;
-    double kth = 40;
-    if (cmd_data[0] < kth) {
-        cmd_data[0] *= 3;
-    } else {
-        cmd_data[0] = ((LIMIT_MOTOR - 3*kth) / (LIMIT_MOTOR - kth)) * (cmd_data[0] - kth) + 3*kth;
-    }
-    int cmd_thrust = cmd_data[0]*thrust_scale;
-    limit_command(cmd_thrust, 0, LIMIT_MOTOR*thrust_scale);
-
-    //double offset_motor[4] = {18.0f, 0.0f, 5.0f, 21.0f};
-    //double offset_motor[4] = {15.0f, 0.0f, 0.0f, 15.0f};
-    double offset_motor[4] = {7.0f, 0.0f, 0.0f, 7.0f};
-    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + offset_motor[0];
-    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + offset_motor[1];
-    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2] + offset_motor[2];
-    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2] + offset_motor[3];
+    cmd_thrust = calculate_thrust(thrust_scale, cmd_data);
+    calculate_motor_control(ctl_data, motor_data);
 
     for (int i = 0; i < 4; i++) {
         double ctl_limit = LIMIT_MOTOR * (1.0f - thrust_scale);
@@ -165,4 +156,26 @@ void Motor::control(int cmd_data[4], float ctl_data[3], Arm &arm) {
     Serial.print("MOTOR COMMAND: ");
     debug_print(motor_data);
 #endif
+}
+
+int Motor::calculate_thrust(double thrust_scale, int cmd_data[4]) {
+    double kth = 40;
+    if (cmd_data[0] < kth) {
+        cmd_data[0] *= 3;
+    } else {
+        cmd_data[0] = ((LIMIT_MOTOR - 3*kth) / (LIMIT_MOTOR - kth)) * (cmd_data[0] - kth) + 3*kth;
+    }
+    int cmd_thrust = cmd_data[0]*thrust_scale;
+    limit_command(cmd_thrust, 0, LIMIT_MOTOR*thrust_scale);
+
+    return cmd_thrust;
+}
+
+void Motor::calculate_motor_control(float ctl_data[3], int motor_data[4]) {
+    double offset_motor[4] = {15.0f, 0.0f, 15.0f, 25.0f};
+    //double offset_motor[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+    motor_data[0] = + ctl_data[0] - ctl_data[1] - ctl_data[2] + offset_motor[0];
+    motor_data[1] = + ctl_data[0] + ctl_data[1] + ctl_data[2] + offset_motor[1];
+    motor_data[2] = - ctl_data[0] + ctl_data[1] - ctl_data[2] + offset_motor[2];
+    motor_data[3] = - ctl_data[0] - ctl_data[1] + ctl_data[2] + offset_motor[3];
 }
